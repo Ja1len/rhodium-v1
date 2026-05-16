@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhodium Engineering | Precision Scientific Solutions</title>
+  <meta name="description" content="Rhodium Engineering provides premium scientific, laboratory and medical equipment solutions for healthcare, research and institutional laboratories.">
+  <style>
+    :root {
+      --bg:#050505; --panel:#0d0d0f; --gold:#d7ad4a; --gold2:#f4c766;
+      --text:#f7f2e8; --muted:#aaa39a; --line:rgba(215,173,74,.25);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); font-family:Inter, Arial, sans-serif; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    #particleCanvas {
+      position:fixed; inset:0; z-index:-2; width:100%; height:100%;
+      background:radial-gradient(circle at 80% 10%, rgba(215,173,74,.14), transparent 32%),
+                 radial-gradient(circle at 20% 70%, rgba(75,118,142,.16), transparent 36%), #050505;
+    }
+    .header {
+      position:fixed; top:0; left:0; right:0; height:78px; z-index:20;
+      display:flex; align-items:center; justify-content:space-between; padding:0 6vw;
+      background:rgba(5,5,5,.78); border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(16px);
+    }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.08em; }
+    .brand img { width:42px; height:42px; object-fit:contain; background:white; border-radius:8px; }
+    .brand span small { display:block; font-size:9px; color:var(--gold); letter-spacing:.35em; }
+    nav { display:flex; gap:26px; align-items:center; color:#ddd; font-size:13px; }
+    nav a:hover { color:var(--gold2); }
+    .nav-cta { border:1px solid var(--gold); padding:10px 16px; border-radius:999px; color:var(--gold2); }
+    .menu { display:none; background:none; border:0; color:white; font-size:28px; }
+    .hero {
+      min-height:100vh; padding:140px 6vw 80px; display:grid; grid-template-columns:1.05fr .95fr;
+      gap:50px; align-items:center;
+    }
+    .eyebrow { color:var(--gold2); text-transform:uppercase; letter-spacing:.16em; font-size:12px; font-weight:800; margin-bottom:18px; }
+    h1 { font-size:clamp(44px,7vw,92px); line-height:.95; letter-spacing:-.07em; max-width:900px; }
+    h2 { font-size:clamp(32px,4vw,62px); line-height:1; letter-spacing:-.05em; }
+    .lead { color:var(--muted); max-width:650px; margin:28px 0 34px; font-size:18px; line-height:1.75; }
+    .actions { display:flex; flex-wrap:wrap; gap:16px; }
+    .btn {
+      min-height:52px; display:inline-flex; align-items:center; justify-content:center; padding:0 24px;
+      border-radius:999px; font-weight:900; font-size:13px; transition:.25s ease;
+    }
+    .btn.primary { background:linear-gradient(135deg,var(--gold2),#a87325); color:#100c05; }
+    .btn.ghost { border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.035); }
+    .btn:hover { transform:translateY(-3px); }
+    .hero-visual {
+      min-height:560px; border:1px solid var(--line); border-radius:36px; position:relative; overflow:hidden;
+      background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018));
+      box-shadow:0 50px 120px rgba(0,0,0,.55), inset 0 0 70px rgba(215,173,74,.06);
+    }
+    .hero-img {
+      position:absolute; inset:42px; border-radius:28px; overflow:hidden; border:1px solid rgba(255,255,255,.08);
+      background:#080808;
+    }
+    .hero-img img { width:100%; height:100%; object-fit:cover; opacity:.78; filter:contrast(1.08) saturate(.92) brightness(.75); }
+    .hero-img:after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 65% 35%, rgba(215,173,74,.16), transparent 35%), linear-gradient(90deg, rgba(5,5,5,.84), transparent 60%); }
+    .tag { position:absolute; padding:10px 14px; border:1px solid var(--line); border-radius:999px; background:rgba(0,0,0,.58); color:#f2d393; font-size:12px; z-index:3; }
+    .tag.a { top:90px; right:58px; } .tag.b { top:210px; left:42px; } .tag.c { bottom:50px; right:50px; }
+    .trust { display:grid; grid-template-columns:repeat(5,1fr); border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
+    .trust span { padding:28px 14px; text-align:center; color:#bdb6aa; border-right:1px solid rgba(255,255,255,.08); font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+    .section { padding:110px 6vw; }
+    .section-head p,.split p { color:var(--muted); line-height:1.8; margin-top:20px; max-width:760px; }
+    .split { display:grid; grid-template-columns:1fr .85fr; gap:70px; align-items:center; }
+    .check { margin-top:26px; display:grid; gap:12px; color:#d7d1c8; list-style:none; }
+    .check li:before { content:"✦"; color:var(--gold2); margin-right:12px; }
+    .panel,.solution,.product-card,.download,.contact-card {
+      background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018));
+      border:1px solid var(--line); border-radius:28px; box-shadow:0 30px 90px rgba(0,0,0,.28);
+    }
+    .panel { padding:34px; }
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:28px; }
+    .metrics div { padding:18px; border:1px solid rgba(255,255,255,.08); border-radius:18px; }
+    .metrics strong { display:block; color:var(--gold2); font-size:28px; }
+    .metrics span { color:var(--muted); font-size:12px; }
+    .solutions,.products,.downloads,.certs { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:38px; }
+    .solution { padding:28px; min-height:250px; transition:.25s ease; }
+    .solution:hover,.product-card:hover,.download:hover { transform:translateY(-8px); border-color:rgba(244,199,102,.65); }
+    .solution span { color:var(--gold2); font-size:38px; font-weight:900; }
+    .solution h3 { margin:28px 0 14px; }
+    .solution p,.product-card p { color:var(--muted); line-height:1.65; }
+    .product-card { overflow:hidden; transition:.25s ease; }
+    .image-wrap { height:260px; background:#101010; overflow:hidden; }
+    .image-wrap img { width:100%; height:100%; object-fit:contain; background:#fff; padding:18px; display:block; }
+    .product-content { padding:22px; }
+    .product-content small { color:var(--gold2); font-size:11px; text-transform:uppercase; letter-spacing:.12em; }
+    .product-content h3 { margin:10px 0; font-size:20px; }
+    .product-content a { display:inline-block; margin-top:18px; color:var(--gold2); font-size:13px; font-weight:800; }
+    .download { padding:28px; display:flex; justify-content:space-between; gap:20px; align-items:center; }
+    .download span { color:var(--gold2); }
+    .certs div { min-height:120px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:22px; background:rgba(255,255,255,.035); color:#e7d7b2; }
+    .contact-wrap { display:flex; justify-content:center; }
+    .contact-card { text-align:center; padding:50px; max-width:760px; width:100%; }
+    .contact-card p { color:var(--muted); margin:12px 0; }
+    .contact-card a:not(.btn) { color:var(--gold2); }
+    footer { border-top:1px solid rgba(255,255,255,.08); padding:40px 6vw; display:flex; justify-content:space-between; gap:30px; color:var(--muted); }
+    footer strong { color:white; } footer a { display:block; margin:8px 0; color:var(--gold2); }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .75s ease, transform .75s ease; }
+    .reveal.show { opacity:1; transform:none; }
+    @media(max-width:980px) {
+      .hero,.split { grid-template-columns:1fr; }
+      .products,.solutions,.downloads,.certs { grid-template-columns:1fr 1fr; }
+      .trust { grid-template-columns:1fr 1fr; }
+      nav { display:none; position:absolute; top:78px; left:0; right:0; padding:24px 6vw; background:#070707; flex-direction:column; align-items:flex-start; }
+      nav.open { display:flex; }
+      .menu { display:block; }
+    }
+    @media(max-width:640px) {
+      .hero { padding-top:120px; }
+      .hero-visual { min-height:420px; }
+      .products,.solutions,.downloads,.metrics,.certs { grid-template-columns:1fr; }
+      footer { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+
+<header class="header">
+  <a class="brand" href="#">
+    <img src="https://res.cloudinary.com/dbuxhg6q8/image/upload/v1778387637/logo_dwsnhn.avif" alt="Rhodium Engineering logo">
+    <span>RHODIUM <small>ENGINEERING</small></span>
+  </a>
+  <button class="menu" id="menu">☰</button>
+  <nav id="nav">
+    <a href="#about">About</a>
+    <a href="#solutions">Solutions</a>
+    <a href="#products">Products</a>
+    <a href="#downloads">Downloads</a>
+    <a href="#contact">Contact</a>
+    <a class="nav-cta" href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20your%20laboratory%20solutions." target="_blank">WhatsApp</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="reveal">
+    <p class="eyebrow">Advanced Scientific & Research Solutions</p>
+    <h1>Precision. Innovation. Scientific Excellence.</h1>
+    <p class="lead">A premium scientific and laboratory solutions partner for healthcare, research, education and institutional laboratories.</p>
+    <div class="actions">
+      <a class="btn primary" href="#products">Explore Solutions</a>
+      <a class="btn ghost" href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20request%20a%20quotation." target="_blank">Request Quotation</a>
+    </div>
+  </div>
+  <div class="hero-visual reveal">
+    <div class="hero-img"><img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/lkBpjKpolqSRlkjniikojq/FMH-800DL.jpg" alt="Scientific laboratory equipment" referrerpolicy="no-referrer"></div>
+    <div class="tag a">Clinical Precision</div>
+    <div class="tag b">Research Ready</div>
+    <div class="tag c">Trusted Support</div>
+  </div>
+</section>
+
+<section class="trust">
+  <span>Hospitals</span><span>Research Centers</span><span>Universities</span><span>Clinical Labs</span><span>STEM Institutions</span>
+</section>
+
+<section class="section split" id="about">
+  <div class="reveal">
+    <p class="eyebrow">About Rhodium Engineering</p>
+    <h2>Scientific solutions shaped for modern laboratories.</h2>
+    <p>Rhodium Engineering supplies laboratory, clinical and scientific equipment solutions for organizations that require reliability, clarity and professional support from enquiry to after-sales coordination.</p>
+    <ul class="check">
+      <li>Professional scientific product sourcing and advisory</li>
+      <li>Laboratory-focused product categorization</li>
+      <li>Quotation and documentation support</li>
+      <li>WhatsApp-first fast inquiry workflow</li>
+    </ul>
+  </div>
+  <div class="panel reveal">
+    <h3>Website Positioning</h3>
+    <p>Advanced Scientific & Research Solutions</p>
+    <div class="metrics">
+      <div><strong>01</strong><span>Research Focus</span></div>
+      <div><strong>02</strong><span>Clinical Ready</span></div>
+      <div><strong>03</strong><span>Institutional Trust</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="solutions">
+  <div class="section-head reveal">
+    <p class="eyebrow">Scientific Solution Ecosystem</p>
+    <h2>Built around real laboratory workflows.</h2>
+    <p>Organized for doctors, procurement teams, laboratory managers and research users to find the right category quickly.</p>
+  </div>
+  <div class="solutions">
+    <article class="solution reveal"><span>01</span><h3>Clinical Laboratory</h3><p>Diagnostic, sample processing, cold chain and sterile workflow categories for healthcare environments.</p></article>
+    <article class="solution reveal"><span>02</span><h3>Research Laboratory</h3><p>Analytical instruments, microscopy, incubators, chambers and scientific measurement systems.</p></article>
+    <article class="solution reveal"><span>03</span><h3>Laboratory Infrastructure</h3><p>Ventilation, safety cabinets, fume hoods, water purification, storage and preparation systems.</p></article>
+  </div>
+</section>
+
+<section class="section" id="products">
+  <div class="section-head reveal">
+    <p class="eyebrow">Product Categories</p>
+    <h2>Premium scientific categories with technical clarity.</h2>
+  </div>
+  <div class="products">
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/poBpjKpolqSRoloolppjjm/FMH-800DL.jpg" alt="Laboratory Ventilation" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Safety & Ventilation</small>
+          <h3>Laboratory Ventilation</h3>
+          <p>Biological safety cabinets, laminar flow cabinets, PCR cabinets, fume hoods and extraction systems.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Laboratory%20Ventilation." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/llBpjKpolqSRqkllqqmnjm/MR-5V60.jpg" alt="Cold Storage Systems" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Cold Chain</small>
+          <h3>Cold Storage Systems</h3>
+          <p>Medical refrigerators, laboratory freezers, blood bank storage and ultra-low temperature preservation.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Cold%20Storage%20Systems." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/ljBpjKpolqSRokprpjjnjp/ST-V50E-ST-V80E-ST-V100E-ST-V120E-ST-V150E.png" alt="Autoclaves & Sterilizers" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Sterilization</small>
+          <h3>Autoclaves & Sterilizers</h3>
+          <p>Vertical autoclaves, portable autoclaves, hot air sterilizers and sterile workflow systems.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Autoclaves%20and%20Sterilizers." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/jkBpjKpolqSRkkrnilnojq/CFG-4LC-100-100.png" alt="Centrifuges" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Sample Processing</small>
+          <h3>Centrifuges</h3>
+          <p>Microcentrifuges, low-speed centrifuges, high-speed centrifuges and clinical centrifuge systems.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Centrifuges." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/jlBpjKpolqSRkkqkkjlkjq/SP-UV5100I.png" alt="Analytical Instruments" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Analysis</small>
+          <h3>Analytical Instruments</h3>
+          <p>Spectrophotometers, colorimeters, FTIR systems, chromatography and scientific measurement equipment.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Analytical%20Instruments." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+      <article class="product-card reveal">
+        <div class="image-wrap">
+          <img src="https://irrorwxhiorjlr5q.ldycdn.com/cloud/lrBpjKpolqSRpknjljnkjp/1.png" alt="Clinical & Diagnostic Systems" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+        <div class="product-content">
+          <small>Medical Laboratory</small>
+          <h3>Clinical & Diagnostic Systems</h3>
+          <p>Diagnostic, clinical and research systems for healthcare laboratories and scientific institutions.</p>
+          <a href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20Clinical%20and%20Diagnostic%20Systems." target="_blank">Inquire via WhatsApp →</a>
+        </div>
+      </article>
+    
+  </div>
+</section>
+
+<section class="section" id="downloads">
+  <div class="section-head reveal">
+    <p class="eyebrow">Downloads</p>
+    <h2>Catalogs, brochures and specifications.</h2>
+  </div>
+  <div class="downloads">
+    <a class="download reveal" href="catalogs/product-catalog.txt" download><strong>Product Category Catalog</strong><span>Download TXT</span></a>
+    <a class="download reveal" href="brochures/scientific-solutions-brochure.txt" download><strong>Scientific Solutions Brochure</strong><span>Download TXT</span></a>
+    <a class="download reveal" href="certifications/certification-readiness.txt" download><strong>Certification Notes</strong><span>Download TXT</span></a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head reveal">
+    <p class="eyebrow">Certification Showcase</p>
+    <h2>Prepared for specification-led enquiries.</h2>
+    <p>Dedicated spaces for product specifications, certificates, brochures and compliance notes. Replace placeholders with official PDFs when ready.</p>
+  </div>
+  <div class="certs reveal">
+    <div>ISO / Quality</div><div>CE / Safety</div><div>Warranty Docs</div><div>Product Specs</div><div>User Manuals</div><div>Technical Datasheets</div>
+  </div>
+</section>
+
+<section class="section contact-wrap" id="contact">
+  <div class="contact-card reveal">
+    <p class="eyebrow">Get In Touch</p>
+    <h2>Let’s build the future of science together.</h2>
+    <p>Email: <a href="mailto:info@rhodiumeng.com">info@rhodiumeng.com</a></p>
+    <p>WhatsApp: <a href="https://wa.me/60122093628" target="_blank">+6012-209 3628</a></p>
+    <br>
+    <a class="btn primary" href="https://wa.me/60122093628?text=Hello%20Rhodium%20Engineering%2C%20I%20would%20like%20to%20inquire%20about%20your%20scientific%20and%20laboratory%20solutions." target="_blank">Chat on WhatsApp</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div><strong>RHODIUM ENGINEERING</strong><p>Precision. Innovation. Scientific Excellence.</p></div>
+  <div><a href="mailto:info@rhodiumeng.com">info@rhodiumeng.com</a><a href="https://wa.me/60122093628" target="_blank">WhatsApp</a></div>
+</footer>
+
+<script>
+  const menu = document.getElementById('menu');
+  const nav = document.getElementById('nav');
+  menu.addEventListener('click', () => nav.classList.toggle('open'));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('show');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    particles = Array.from({length: Math.min(100, Math.floor(innerWidth / 14))}, () => ({
+      x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+      vx: (Math.random()-.5)*0.35, vy: (Math.random()-.5)*0.35, r: Math.random()*1.7+.4
+    }));
+  }
+  resize(); addEventListener('resize', resize);
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i) => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = 'rgba(244,199,102,.55)'; ctx.fill();
+      for(let j=i+1;j<particles.length;j++) {
+        const q = particles[j], dx=p.x-q.x, dy=p.y-q.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120) {
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle = `rgba(244,199,102,${(1-d/120)*.16})`;
+          ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>
